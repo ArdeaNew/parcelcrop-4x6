@@ -6,9 +6,7 @@
 
 ParcelCrop 4x6 是 Windows 桌面面单裁切工具。批量加入多个单页 PDF，检查自动检测的范围，按需移动、缩放裁切框和旋转方向，再导出到原文件夹。文档在本机处理，应用没有上传服务、账户或遥测。
 
-当前版本：**2.2.0**。本项目从用户提供的 LabelTrim 2.1.1.0 可执行程序恢复源码并继续开发；恢复范围与限制见[来源说明](docs/PROVENANCE.md)。原名与已有同类产品重名，改名依据见[名称检索记录](docs/NAMING.md)。
-
-![合成面单导出验收：原 PDF 保留](docs/images/export-smoke.png)
+当前版本：**2.2.1**。本项目从用户提供的 LabelTrim 2.1.1.0 可执行程序恢复源码并继续开发；恢复范围与限制见[来源说明](docs/PROVENANCE.md)。原名与已有同类产品重名，改名依据见[名称检索记录](docs/NAMING.md)。
 
 ## 输出规格
 
@@ -27,7 +25,7 @@ ParcelCrop 4x6 是 Windows 桌面面单裁切工具。批量加入多个单页 P
 
 运行环境：Windows x64、.NET Framework 4.8，以及单独提供的 MuPDF `mutool.exe`。应用界面目前为英文。
 
-1. 从本仓库 Releases 下载便携包并完整解压；首次发布前也可按下文从源码构建。
+1. 从本仓库 Releases 下载便携包并完整解压；也可按下文从源码构建。
 2. 从 [MuPDF 官方下载入口](https://mupdf.com/releases)取得 Windows 版 `mutool.exe`，保留其许可文件。将它放在 `ParcelCrop.exe` 旁，或设置 `PARCELCROP_MUTOOL` 为其完整路径。详细操作见[渲染器配置](docs/USER_GUIDE.md#配置-pdf-渲染器)。**本项目公开便携包不包含该渲染器。**
 3. 打开 `ParcelCrop.exe`，点击 **Browse files / Add files** 或拖入单页 PDF。
 4. 检查左侧裁切范围和右侧输出预览；拖动框内部移动，拖动角点等比缩放，按需旋转。
@@ -43,10 +41,10 @@ ParcelCrop 4x6 是 Windows 桌面面单裁切工具。批量加入多个单页 P
 ./scripts/build.ps1
 ./scripts/test.ps1
 ./scripts/test.ps1 -RendererPath 'C:\Tools\MuPDF\mutool.exe'
-./scripts/package.ps1 -Version 2.2.0
+./scripts/package.ps1 -Version 2.2.1
 ```
 
-构建产物：`src/ParcelCrop/bin/Release/net48/ParcelCrop.exe`。便携包：`artifacts/ParcelCrop-4x6-2.2.0-win-x64.zip`，附 SHA-256 校验文件。默认测试验证核心行为；指定渲染器后增加真实 PDF 集成测试。自动化测试不能替代资源管理器可见性和实际打印的人工验收，验收项目见[发布流程](docs/RELEASING.md)。
+构建产物：`src/ParcelCrop/bin/Release/net48/ParcelCrop.exe`。便携包：`artifacts/ParcelCrop-4x6-2.2.1-win-x64.zip`，附 SHA-256 校验文件。默认测试验证核心行为；指定渲染器后增加真实 PDF 集成测试。自动化测试不能替代资源管理器可见性和实际打印的人工验收，验收项目见[发布流程](docs/RELEASING.md)。
 
 ## 范围与限制
 

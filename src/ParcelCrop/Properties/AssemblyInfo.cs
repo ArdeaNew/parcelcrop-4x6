@@ -4,8 +4,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 
 [assembly: AssemblyProduct("ParcelCrop 4x6")]
-[assembly: AssemblyFileVersion("2.2.0.0")]
+[assembly: AssemblyFileVersion("2.2.1.0")]
 [assembly: AssemblyTitle("ParcelCrop 4x6")]
 [assembly: AssemblyDescription("Shipping Label Crop Tool")]
-[assembly: AssemblyVersion("2.2.0.0")]
+[assembly: AssemblyVersion("2.2.1.0")]
 [assembly: InternalsVisibleTo("ParcelCrop.Tests")]

@@ -18,7 +18,7 @@
 ./scripts/build.ps1 -Configuration Release
 ./scripts/test.ps1
 ./scripts/test.ps1 -RendererPath 'C:\Tools\MuPDF\mutool.exe'
-./scripts/package.ps1 -Version 2.2.0
+./scripts/package.ps1 -Version 2.2.1
 ```
 
 也可直接构建应用：
@@ -43,6 +43,8 @@ artifacts/                  本地生成的发行包；不纳入源码版本管�
 ## 开发约定
 
 保持公开输出合同稳定：1600×2400、400 DPI、等比适配、质量 95、默认保留源文件、拒绝覆盖。行为修改必须同步[架构文档](ARCHITECTURE.md)与用户说明。
+
+发布构建应采用统一路径映射，并避免将本机调试路径带入发行二进制。隐私检查需要同时检查源码、编译产物和文档图片；只搜索文本文件不能发现截图中的用户名或可执行文件中的调试路径。
 
 核心逻辑尽量不依赖真实桌面或真实业务文件。裁切算法用合成位图验证，转换用临时目录验证写入、尺寸、DPI、冲突与错误路径；真实渲染器测试单独运行。UI 相关回归应覆盖快速切换任务、清空、停止和关闭期间的异步完成，不只验证“正常点击一遍”。
 

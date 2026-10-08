@@ -6,7 +6,7 @@
 
 ParcelCrop 4x6 is a Windows desktop utility for cropping shipping labels. Add a batch of single-page PDFs, review the detected bounds, move or resize the crop and rotate as needed, then export beside each original. Processing is local; the application has no upload service, accounts, or telemetry. The current interface is in English.
 
-Version **2.2.0** continues development from source recovered from a user-provided LabelTrim 2.1.1.0 executable. See [provenance](docs/PROVENANCE.md) for the recovery limits and [naming research](docs/NAMING.md) for the rename.
+Version **2.2.1** continues development from source recovered from a user-provided LabelTrim 2.1.1.0 executable. See [provenance](docs/PROVENANCE.md) for the recovery limits and [naming research](docs/NAMING.md) for the rename.
 
 ## Output contract
 
@@ -25,7 +25,7 @@ The **output canvas** has a 2:3 ratio. Resizing the crop retains the initial det
 
 Requirements: Windows x64, .NET Framework 4.8, and a separately supplied MuPDF `mutool.exe`.
 
-1. Download and extract the portable archive from this repository's Releases, or build from source before the first release.
+1. Download and extract the portable archive from this repository's Releases, or build from source.
 2. Obtain Windows `mutool.exe` from the [official MuPDF releases](https://mupdf.com/releases), retaining its licensing material. Place it beside `ParcelCrop.exe`, or set `PARCELCROP_MUTOOL` to its full path. **The public portable package does not bundle the renderer.** See [renderer setup](docs/USER_GUIDE.md#配置-pdf-渲染器).
 3. Launch `ParcelCrop.exe`. Choose **Browse files / Add files**, or drop single-page PDFs onto the window.
 4. Review both previews. Drag inside the crop to move it, drag a corner to resize proportionally, and rotate if needed.
@@ -41,10 +41,10 @@ On Windows x64, install .NET SDK 10 and the .NET Framework 4.8 Developer Pack / 
 ./scripts/build.ps1
 ./scripts/test.ps1
 ./scripts/test.ps1 -RendererPath 'C:\Tools\MuPDF\mutool.exe'
-./scripts/package.ps1 -Version 2.2.0
+./scripts/package.ps1 -Version 2.2.1
 ```
 
-The executable is written to `src/ParcelCrop/bin/Release/net48/ParcelCrop.exe`. Packaging produces `artifacts/ParcelCrop-4x6-2.2.0-win-x64.zip` and a SHA-256 checksum file. The default tests cover core contracts; supplying a renderer adds real-PDF integration checks. Explorer visibility and physical printing need separate manual acceptance checks in the [release process](docs/RELEASING.md).
+The executable is written to `src/ParcelCrop/bin/Release/net48/ParcelCrop.exe`. Packaging produces `artifacts/ParcelCrop-4x6-2.2.1-win-x64.zip` and a SHA-256 checksum file. The default tests cover core contracts; supplying a renderer adds real-PDF integration checks. Explorer visibility and physical printing need separate manual acceptance checks in the [release process](docs/RELEASING.md).
 
 ## Limitations
 
