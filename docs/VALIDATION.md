@@ -40,4 +40,6 @@
 
 新环境应按 [DEVELOPMENT.md](DEVELOPMENT.md) 构建，并使用其实际安装的渲染器重复验证。公共 CI 默认运行不依赖外部渲染器的 51 项测试；没有渲染器时另外 4 项明确报告跳过。
 
-发行 ZIP 的校验和由打包脚本生成。GitHub 仓库创建、源码上传、CI 和 Release 状态需分别核验，不能从本地测试结果推断远端已发布。
+完整源码已上传至 [ArdeaNew/parcelcrop-4x6](https://github.com/ArdeaNew/parcelcrop-4x6)，55 个文件的源码树与本地 Git 树校验值一致。首次远端 [Build and test](https://github.com/ArdeaNew/parcelcrop-4x6/actions/runs/37740206888) 已成功完成，包含 Windows 构建、51 项核心测试与打包。
+
+独立从源码 ZIP 解压至干净目录后，Release 再次零警告、零错误构建，55 项测试全部通过；便携包内 14 份 Markdown 的 37 个相对链接全部存在。发行 ZIP 的校验和由最终文件生成，远端 Release 状态以 GitHub 页面为准。
