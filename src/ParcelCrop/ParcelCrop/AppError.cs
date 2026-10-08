@@ -4,11 +4,26 @@ using System.IO;
 
 namespace ParcelCrop;
 
+internal enum AppErrorKind
+{
+	General,
+	ComponentUnavailable
+}
+
 internal sealed class AppError : IOException
 {
-	internal AppError(string message)
+	internal AppErrorKind Kind { get; }
+
+	internal AppError(string message, AppErrorKind kind = AppErrorKind.General)
 		: base(message)
 	{
+		Kind = kind;
+	}
+
+	internal static string PreviewTitle(Exception error)
+	{
+		return error is AppError appError && appError.Kind == AppErrorKind.ComponentUnavailable
+			? "PDF component unavailable" : "Preview unavailable";
 	}
 
 	internal static string Describe(Exception error)
@@ -33,6 +48,6 @@ internal sealed class AppError : IOException
 		{
 			return "Cannot read or write this file. Check permissions and available space. PDF kept.";
 		}
-		return "Cannot process this PDF. It may be damaged or password protected. PDF kept.";
+		return "Cannot complete this operation. Try again. PDF kept.";
 	}
 }

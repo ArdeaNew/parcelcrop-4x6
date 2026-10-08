@@ -14,6 +14,7 @@ namespace ParcelCrop.Tests
     {
         internal static void Register(Action<string, Action> add)
         {
+            UiErrorTests.Register(add);
             add("crop canvas / sub-two-pixel thumbnail crop does not throw", () =>
             {
                 using (CropCanvas canvas = new CropCanvas())

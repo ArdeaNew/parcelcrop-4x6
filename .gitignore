@@ -5,6 +5,7 @@
 *.user
 *.suo
 artifacts/
+.cache/
 TestResults/
 mutool.exe
 *.pdf

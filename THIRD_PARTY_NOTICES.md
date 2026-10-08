@@ -2,27 +2,29 @@
 
 ## ParcelCrop 4x6
 
-本仓库应用代码、恢复后继续开发的改动与项目文档按 **GNU Affero General Public License v3.0 or later（AGPL-3.0-or-later）** 发布，完整条款见 [LICENSE](LICENSE)。来源和恢复范围见 [docs/PROVENANCE.md](docs/PROVENANCE.md)。原始包中的代码与资源来源说明不会因恢复源码而自动变成第三方授权证明。
+本项目代码与文档采用 **GNU Affero General Public License v3.0 or later（AGPL-3.0-or-later）**，完整条款见 [LICENSE](LICENSE)。
 
-## MuPDF / mutool — 外部运行依赖
+## MuPDF 1.28.5
 
-- 开发者：Artifex Software, Inc. 及 MuPDF 贡献者。
-- 官方源码：[ArtifexSoftware/mupdf](https://github.com/ArtifexSoftware/mupdf)。
-- 官方下载：[MuPDF releases](https://mupdf.com/releases)。
-- 许可：官方提供 GNU AGPL 和商业许可选择，详见[官方许可说明](https://mupdf.readthedocs.io/en/latest/license.html)及所使用版本附带的 `COPYING`、版权和第三方许可材料。
+- 版权所有：Artifex Software, Inc. 及 MuPDF 贡献者。
+- 官方发行：[MuPDF 1.28.5](https://github.com/ArtifexSoftware/mupdf-downloads/releases/tag/1.28.5)。
+- 随包文件：官方未修改的 Windows x64 `mutool.exe`。
+- 许可：GNU AGPL v3 or later；第三方组件保留各自许可证。
 
-应用通过独立进程调用 `mutool show` 与 `mutool draw`。仓库和公开便携包**不捆绑** `mutool.exe`，使用者自行取得并配置。项目的 AGPL 许可不替代渲染器自身的许可条款。
+便携包的 `licenses/MuPDF/` 目录保留上游 `COPYING.txt`、`README.txt`、`CHANGES.txt`，以及源码中依赖、字体和断词资料的许可与版权声明。完整文件清单和官方 SHA-256 记录在源码仓库的 `scripts/mupdf.lock.json`。
 
-原始便携包的 `ThirdPartyNotices.txt` 声明使用未修改的 mutool 1.26.2。该声明只作为来源记录：原二进制的构建来源、对应源码和完整依赖许可未得到独立核验，因此不会将其复制到公开发布物。未来若决定捆绑渲染器，应针对确切版本保留完整许可和版权说明，提供适用的对应源码与构建材料，核验所有传递依赖，并在发布清单列明来源、版本及哈希。仅链接上游主页不能代替应履行的发布义务。
+This software is based in part on the work of the Independent JPEG Group.
 
-## .NET Framework / Windows — 系统依赖
+This software is based in part on the work of the FreeType Team (https://freetype.org).
 
-应用使用 .NET Framework 4.8 的 WinForms、System.Drawing 等系统程序集及 Windows Shell API。运行时和目标框架引用程序集不随本应用源码或便携包重新授权，按 Microsoft 的相应许可使用。项目不包含 .NET Framework 安装程序。
+### 对应源码
 
-## ILSpy — 仅源码恢复工具
+[本版本 Release](https://github.com/ArdeaNew/parcelcrop-4x6/releases/tag/v2.2.2) 与便携包同时提供未经改动的 **[mupdf-1.28.5-source.tar.gz](https://github.com/ArdeaNew/parcelcrop-4x6/releases/download/v2.2.2/mupdf-1.28.5-source.tar.gz)**，无需收费，可单独下载。该归档包含 MuPDF 与所需第三方源码和构建文件。
 
-恢复过程使用 ILSpy / ilspycmd 11.1。项目和许可分别见 [ILSpy](https://github.com/icsharpcode/ILSpy) 与 [MIT license](https://github.com/icsharpcode/ILSpy/blob/master/LICENSE)。它不是 ParcelCrop 的运行时依赖，未随应用发布；重新构建本项目不需要它。
+源码 SHA-256：`98a5c10cda20c3992cdf76ff6b2a1149c32bd79cc796d3f703230b1185b7e934`。
 
-## 图标与测试材料
+Windows 工程位于 `platform/win32/mupdf.sln`，配置为 `Release|x64`，使用 Visual Studio v142 工具集与 Windows SDK 10.0。构建说明见源码内文档及[对应版本的官方指南](https://mupdf.readthedocs.io/en/1.28.5/guide/install.html)。
 
-应用图标从用户提供的原程序集恢复，其来源记录与原程序一致。测试样例应由测试代码生成或明确标注可再分发来源；不应使用真实快递面单。没有采用第三方字体包、图标库或外部 NuGet 测试框架。
+## .NET Framework / Windows
+
+.NET Framework 4.8、WinForms、System.Drawing 和 Windows Shell 是系统依赖，适用 Microsoft 的相应许可；本项目不分发 .NET Framework 安装程序。

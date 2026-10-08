@@ -13,7 +13,7 @@ dotnet build tests/ParcelCrop.Tests/ParcelCrop.Tests.csproj -c Release
 
 首次构建仍需生成 SDK 的还原元数据，但项目没有第三方测试包需要下载。已完成还原时可使用 `dotnet build --no-restore`。
 
-默认运行 **51 项测试**，并明确标记跳过 4 项真实 MuPDF 集成测试。默认进程测试把测试程序本身当作可预测的模拟渲染器，不需要安装 `mutool.exe`。
+默认运行 **61 项测试**，并明确标记跳过 4 项真实 MuPDF 集成测试。默认进程测试把测试程序本身当作可预测的模拟渲染器，不需要安装 `mutool.exe`。
 
 若已有从可信来源取得的 MuPDF，可显式启用真实渲染器测试：
 
@@ -21,7 +21,7 @@ dotnet build tests/ParcelCrop.Tests/ParcelCrop.Tests.csproj -c Release
 & ./tests/ParcelCrop.Tests/bin/Release/net48/ParcelCrop.Tests.exe --renderer 'C:\Tools\MuPDF\mutool.exe'
 ```
 
-这会运行全部 **55 项测试**。测试程序不会自动下载或捆绑 MuPDF。`--help` 显示简短用法。
+这会运行全部 **65 项测试**。`scripts/package.ps1` 会恢复锁定的官方组件并执行全部测试；发布和 CI 不接受跳过真实 PDF 集成测试。`--help` 显示简短用法。
 
 ## 覆盖范围
 
@@ -33,6 +33,7 @@ dotnet build tests/ParcelCrop.Tests/ParcelCrop.Tests.csproj -c Release
 | 通知与回收 | 创建通知看到完整且未锁定的 JPG、发布后才调用回收、删除后才发删除通知、回收失败与无操作回收、通知异常、发布后源文件再次变化 |
 | 原生回调保护 | 拒绝不支持回收的删除请求、COM 进度接口可被获取 |
 | 渲染进程 | 缺少程序、单页、空白、多页、异常退出、非法页数、缺少输出、预先取消、运行中取消与进程退出 |
+| 组件与恢复 | 随包组件优先级、失效环境设置、显式路径、损坏 EXE、缺失 DLL、错误分类、完整错误详情、恢复后同队列重试、失败文件不阻塞后续任务 |
 | 预览与任务生命周期 | 缩略图中不足 2 像素的有效裁切、捕获丢失结束拖动、移除任务取消准备、晚到及未赋给 UI 的结果清理、重复释放、失败任务释放、各任务取消相互隔离、窗口取消联动 |
 | 窗口关闭 | 实际 WinForms 消息循环中等待活动渲染器退出后关闭；清空列表后仍等待原渲染任务完成 |
 | 可选真实 MuPDF | 程序生成的单页 PDF 完整转换、多页拒绝、空白识别、损坏文件拒绝 |

@@ -91,6 +91,8 @@ namespace ParcelCrop.Tests
                 if (input == null) return 70;
                 string[] fixture = File.ReadAllText(input).Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 string mode = fixture[0].Replace("PARCELCROP-TEST:", "");
+                if (mode == "missing-dll") return unchecked((int)0xC0000135);
+                if (mode == "bad-image") return unchecked((int)0xC000007B);
                 if (mode == "hang")
                 {
                     if (fixture.Length > 1) File.WriteAllText(fixture[1], Process.GetCurrentProcess().Id.ToString());

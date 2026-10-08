@@ -8,7 +8,7 @@ body:
   - type: input
     id: versions
     attributes:
-      label: Application, Windows and MuPDF versions
+      label: Application and Windows versions
     validations:
       required: true
   - type: textarea

@@ -51,7 +51,9 @@ internal sealed class MainForm : Form
 
 	private readonly Label note;
 
-	private readonly Label details;
+	internal readonly TextBox Details;
+
+	internal readonly Button RetryPreviewButton;
 
 	private readonly Button addButton;
 
@@ -124,8 +126,21 @@ internal sealed class MainForm : Form
 			Font = new Font("Consolas", 8.5f),
 			AutoSize = false
 		};
-		details = MakeLabel("", 8.5f, Muted);
-		details.AutoEllipsis = true;
+		Details = new TextBox
+		{
+			ReadOnly = true,
+			Multiline = true,
+			WordWrap = true,
+			ScrollBars = ScrollBars.Vertical,
+			BorderStyle = BorderStyle.None,
+			BackColor = Color.White,
+			ForeColor = Muted,
+			Font = new Font("Consolas", 8.5f),
+			AccessibleName = "Selected file details"
+		};
+		RetryPreviewButton = MakeButton("Retry preview", primary: true);
+		RetryPreviewButton.AccessibleName = "Retry preview of the selected PDF";
+		RetryPreviewButton.Click += delegate { PreviewTask = ShowSelectedAsync(); };
 		addButton = MakeButton("Add files", primary: false);
 		browseButton = MakeButton("Browse files", primary: true);
 		removeButton = MakeIcon("Remove", "Remove the selected file from the list");
@@ -169,12 +184,12 @@ internal sealed class MainForm : Form
 			SelectionMode = SelectionMode.One,
 			AccessibleName = "PDF files"
 		};
-		Controls.AddRange(new Control[17]
+		Controls.AddRange(new Control[18]
 		{
-			heading, specification, queueHeading, status, note, details, addButton, removeButton, clearButton, autoButton,
-			rotateButton, openButton, StartButton, Canvas, FileQueue, browseButton, recycleSource
+			heading, specification, queueHeading, status, note, Details, addButton, removeButton, clearButton, autoButton,
+			rotateButton, openButton, StartButton, Canvas, FileQueue, browseButton, recycleSource, RetryPreviewButton
 		});
-		Canvas.Controls.AddRange(new Control[3] { browseButton, autoButton, rotateButton });
+		Canvas.Controls.AddRange(new Control[4] { browseButton, autoButton, rotateButton, RetryPreviewButton });
 		addButton.Click += ChooseFiles;
 		browseButton.Click += ChooseFiles;
 		removeButton.Click += delegate
@@ -325,11 +340,12 @@ internal sealed class MainForm : Form
 			clearButton.SetBounds(num - num3 - S(87), num9 + S(6), S(53), S(32));
 			removeButton.SetBounds(num - num3 - S(28), num9 + S(6), S(28), S(32));
 			int num11 = num9 + S(52);
-			FileQueue.SetBounds(num8, num11, num6, Math.Max(S(130), num10 - num11 - S(88)));
-			details.SetBounds(num8 + S(6), num10 - S(78), num6 - S(12), S(36));
+			FileQueue.SetBounds(num8, num11, num6, Math.Max(S(100), num10 - num11 - S(164)));
+			Details.SetBounds(num8 + S(6), num10 - S(154), num6 - S(12), S(112));
 			openButton.SetBounds(num8 - S(6), num10 - S(33), S(111), S(33));
 			addButton.SetBounds(num - num3 - S(105), num10 - S(33), S(105), S(33));
 			browseButton.SetBounds((num7 - S(142)) / 2, Canvas.Height / 2 + S(19), S(142), S(38));
+			RetryPreviewButton.SetBounds((num7 - S(158)) / 2, Canvas.Height / 2 + S(19), S(158), S(38));
 			status.SetBounds(num3, num2 - S(91), num5 - S(200), S(26));
 			note.SetBounds(num3, num2 - S(65), num5 - S(200), S(22));
 			recycleSource.SetBounds(num3, num2 - S(40), num5 - S(200), S(24));
@@ -388,12 +404,14 @@ internal sealed class MainForm : Form
 			bool visible = flag4;
 			button4.Visible = visible;
 			browseButton.Visible = !flag;
+			RetryPreviewButton.Visible = selected != null && selected.Failed && selected.Page == null && !busy;
+			RetryPreviewButton.Enabled = !busy && !flag3;
 			Label label = queueHeading;
 			ListBox fileQueue = FileQueue;
 			Button button5 = clearButton;
 			Button button6 = removeButton;
 			Button button7 = addButton;
-			flag4 = (details.Visible = flag);
+			flag4 = (Details.Visible = flag);
 			bool flag11 = flag4;
 			flag4 = (button7.Visible = flag11);
 			bool flag13 = flag4;
@@ -408,10 +426,12 @@ internal sealed class MainForm : Form
 			queueHeading.Text = "FILES (" + Jobs.Count + ")";
 			openButton.Visible = flag && selected != null;
 			openButton.Enabled = selected != null && Directory.Exists(Path.GetDirectoryName(selected.Source));
-			details.Text = ((selected == null) ? "" : (selected.Detail ?? Path.GetDirectoryName(selected.Source)));
+			string detail = (selected == null) ? "" : (selected.Detail ?? Path.GetDirectoryName(selected.Source));
+			// Avoid resetting selection/scroll position on unrelated queue updates.
+			if (Details.Text != detail) Details.Text = detail;
 			if (selected != null)
 			{
-				tips.SetToolTip(details, selected.Detail ?? Path.GetDirectoryName(selected.Source));
+				tips.SetToolTip(Details, detail);
 			}
 			FileQueue.Invalidate();
 			Canvas.Invalidate();
@@ -511,8 +531,15 @@ internal sealed class MainForm : Form
 		{
 			return job.Page;
 		}
+		if (job.Preparation != null && (job.Preparation.IsFaulted || job.Preparation.IsCanceled))
+		{
+			// A repaired component or retried file must start fresh in the same queue.
+			job.Preparation = null;
+		}
 		if (job.Preparation == null)
 		{
+			job.Failed = false;
+			job.Detail = null;
 			job.Status = "Reading...";
 			job.Preparation = converter.PrepareAsync(job.Source, job.CreatePreparationToken(lifetime.Token));
 			activePreparations.Add(job.Preparation);
@@ -533,6 +560,8 @@ internal sealed class MainForm : Form
 				job.Crop = preparedPage.AutoCrop;
 				job.Turns = ((job.Crop.Width > job.Crop.Height) ? 1 : 0);
 				job.Status = (preparedPage.IsBlank ? "Blank page" : "Ready");
+				job.Failed = preparedPage.IsBlank;
+				job.Detail = null;
 				if (preparedPage.IsBlank)
 				{
 					job.Failed = true;
@@ -562,7 +591,9 @@ internal sealed class MainForm : Form
 		EnsureUiContext();
 		try
 		{
-			await EnsurePageAsync(job);
+			Task<PreparedPage> preparation = EnsurePageAsync(job);
+			UpdateControls();
+			await preparation;
 			if (version == selectionVersion && !closing && !job.Removed)
 			{
 				Canvas.SetPage(job.Page.LoadThumbnail(), job.Page.PageSize, job.Crop, job.Page.AutoCrop.Size);
@@ -576,11 +607,11 @@ internal sealed class MainForm : Form
 		catch (Exception error)
 		{
 			job.Failed = true;
-			job.Status = "Preview failed";
+			job.Status = AppError.PreviewTitle(error);
 			job.Detail = AppError.Describe(error);
 			if (version == selectionVersion && !closing)
 			{
-				Canvas.EmptyText = "Cannot open this PDF";
+				Canvas.EmptyText = AppError.PreviewTitle(error);
 			}
 		}
 		finally
@@ -690,6 +721,8 @@ internal sealed class MainForm : Form
 					}
 					if (job == Selected && !closing)
 					{
+						Canvas.SetPage(job.Page.LoadThumbnail(), job.Page.PageSize, job.Crop, job.Page.AutoCrop.Size);
+						Canvas.EmptyText = "";
 						Canvas.ShowOutput(job.Turns);
 					}
 					continue;
@@ -701,8 +734,12 @@ internal sealed class MainForm : Form
 				{
 					failures++;
 					job.Failed = true;
-					job.Status = "Not processed";
+					job.Status = job.Page == null ? AppError.PreviewTitle(error) : "Not processed";
 					job.Detail = AppError.Describe(error);
+					if (job == Selected && job.Page == null && !closing)
+					{
+						Canvas.EmptyText = AppError.PreviewTitle(error);
+					}
 					continue;
 				}
 				break;
@@ -745,7 +782,7 @@ internal sealed class MainForm : Form
 		}
 		catch (Exception)
 		{
-			details.Text = "Cannot open this folder.";
+			Details.Text = "Cannot open this folder.";
 		}
 	}
 

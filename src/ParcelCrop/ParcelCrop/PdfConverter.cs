@@ -15,7 +15,7 @@ namespace ParcelCrop;
 internal sealed class PdfConverter
 {
 	private static readonly SemaphoreSlim RenderGate = new SemaphoreSlim(1, 1);
-	private readonly string mutoolPath;
+	private readonly string explicitRenderer;
 	private readonly Action<string> notifyCreated;
 	private readonly Action<string> recycleFile;
 	private readonly Action<string> notifyDeleted;
@@ -24,9 +24,7 @@ internal sealed class PdfConverter
 	internal PdfConverter(string renderer = null, Action<string> notifyCreated = null,
 		Action<string> recycleFile = null, Action<string> notifyDeleted = null)
 	{
-		string configured = renderer ?? Environment.GetEnvironmentVariable("PARCELCROP_MUTOOL");
-		mutoolPath = Path.GetFullPath(string.IsNullOrWhiteSpace(configured)
-			? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mutool.exe") : configured);
+		explicitRenderer = renderer;
 		this.notifyCreated = notifyCreated ?? ShellNotifications.Created;
 		this.recycleFile = recycleFile ?? SafeRecycleBin.Recycle;
 		this.notifyDeleted = notifyDeleted ?? ShellNotifications.Deleted;
@@ -49,10 +47,14 @@ internal sealed class PdfConverter
 	{
 		token.ThrowIfCancellationRequested();
 		source = ValidateSource(source);
+		string mutoolPath = RendererPathResolver.Resolve(explicitRenderer, AppDomain.CurrentDomain.BaseDirectory,
+			Environment.GetEnvironmentVariable("PARCELCROP_MUTOOL"));
 		if (!File.Exists(mutoolPath))
 		{
-			throw new AppError("Missing mutool.exe. Place it beside the application or set PARCELCROP_MUTOOL.");
+			throw new AppError("The PDF component is missing. Extract the complete Windows package again. PDF kept.",
+				AppErrorKind.ComponentUnavailable);
 		}
+		RendererPathResolver.ValidateExecutable(mutoolPath);
 		PreparedPage page = new PreparedPage
 		{
 			DirectoryPath = Path.Combine(Path.GetTempPath(), "parcelcrop", Guid.NewGuid().ToString("N"))
@@ -69,7 +71,7 @@ internal sealed class PdfConverter
 				stream.CopyTo(destination);
 			}
 			token.ThrowIfCancellationRequested();
-			if (!int.TryParse(RunTool("show " + Quote(input) + " trailer/Root/Pages/Count", token).Trim(), out int count) || count < 1)
+			if (!int.TryParse(RunTool(mutoolPath, "show " + Quote(input) + " trailer/Root/Pages/Count", token).Trim(), out int count) || count < 1)
 			{
 				throw new AppError("Cannot read this PDF. PDF kept.");
 			}
@@ -78,7 +80,7 @@ internal sealed class PdfConverter
 				throw new AppError("Multiple pages found. Split into single-page PDFs first. PDF kept.");
 			}
 			page.RasterPath = Path.Combine(page.DirectoryPath, "page.png");
-			RunTool("draw -q -F png -c rgb -r 300 -w 5000 -h 5000 -o " + Quote(page.RasterPath) + " " + Quote(input) + " 1", token);
+			RunTool(mutoolPath, "draw -q -F png -c rgb -r 300 -w 5000 -h 5000 -o " + Quote(page.RasterPath) + " " + Quote(input) + " 1", token);
 			if (!File.Exists(page.RasterPath))
 			{
 				throw new AppError("Cannot render this PDF. PDF kept.");
@@ -100,20 +102,14 @@ internal sealed class PdfConverter
 		}
 	}
 
-	private string RunTool(string arguments, CancellationToken token)
+	private static string RunTool(string mutoolPath, string arguments, CancellationToken token)
 	{
 		token.ThrowIfCancellationRequested();
-		using Process process = Process.Start(new ProcessStartInfo(mutoolPath, arguments)
-		{
-			UseShellExecute = false,
-			CreateNoWindow = true,
-			RedirectStandardOutput = true,
-			RedirectStandardError = true,
-			WorkingDirectory = Path.GetDirectoryName(mutoolPath)
-		});
+		using Process process = StartRenderer(mutoolPath, arguments);
 		if (process == null)
 		{
-			throw new AppError("Cannot start the PDF reader.");
+			throw new AppError("The PDF component could not start. Extract the complete Windows package again. PDF kept.",
+				AppErrorKind.ComponentUnavailable);
 		}
 		Task<string> stdout = process.StandardOutput.ReadToEndAsync();
 		Task<string> stderr = process.StandardError.ReadToEndAsync();
@@ -132,6 +128,12 @@ internal sealed class PdfConverter
 			Task.WaitAll(stdout, stderr);
 			if (process.ExitCode != 0)
 			{
+				uint exitCode = unchecked((uint)process.ExitCode);
+				if (exitCode == 0xC0000135 || exitCode == 0xC000007B || exitCode == 0xC0000142 || exitCode == 0xC0000139)
+				{
+					throw new AppError("The PDF component could not load. Extract the complete Windows package again. PDF kept.",
+						AppErrorKind.ComponentUnavailable);
+				}
 				throw new AppError("Cannot read this PDF. It may be damaged or password protected. PDF kept.");
 			}
 			return stdout.Result;
@@ -149,6 +151,27 @@ internal sealed class PdfConverter
 			}
 			catch (InvalidOperationException) { }
 			catch (System.ComponentModel.Win32Exception) { }
+		}
+	}
+
+	private static Process StartRenderer(string mutoolPath, string arguments)
+	{
+		try
+		{
+			return Process.Start(new ProcessStartInfo(mutoolPath, arguments)
+			{
+				UseShellExecute = false,
+				ErrorDialog = false,
+				CreateNoWindow = true,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+				WorkingDirectory = Path.GetDirectoryName(mutoolPath)
+			});
+		}
+		catch (System.ComponentModel.Win32Exception)
+		{
+			throw new AppError("The PDF component could not start. Extract the complete Windows package again and check file permissions. PDF kept.",
+				AppErrorKind.ComponentUnavailable);
 		}
 	}
 

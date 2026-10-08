@@ -123,10 +123,10 @@ internal sealed class CropCanvas : Control
 		float num = e.Graphics.DpiX / 96f;
 		if (PageImage == null)
 		{
-			Rectangle bounds = new Rectangle(16, Height / 2 - (int)(66f * num), Width - 32, (int)(32f * num));
+			Rectangle bounds = new Rectangle(16, Height / 2 - (int)(82f * num), Width - 32, (int)(60f * num));
 			using (Font font = new Font(Font.FontFamily, 16f, FontStyle.Regular))
 			{
-				TextRenderer.DrawText(e.Graphics, EmptyText, font, bounds, Color.FromArgb(74, 87, 87), TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+				TextRenderer.DrawText(e.Graphics, EmptyText, font, bounds, Color.FromArgb(74, 87, 87), TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.WordBreak | TextFormatFlags.NoPrefix);
 			}
 			if (EmptyText == "Add PDF files")
 			{

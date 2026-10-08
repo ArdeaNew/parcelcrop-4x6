@@ -21,10 +21,59 @@ namespace ParcelCrop.Tests
                     {
                         using (new PdfConverter(temp.PathFor("not-installed.exe")).Prepare(source, CancellationToken.None)) { }
                     }, "Missing renderer");
-                    Check.True(error.Message.IndexOf("mutool", StringComparison.OrdinalIgnoreCase) >= 0, "Missing renderer message omits mutool");
+                    Check.Equal(AppErrorKind.ComponentUnavailable, error.Kind, "Missing component classification");
+                    Check.True(error.Message.IndexOf("complete Windows package", StringComparison.OrdinalIgnoreCase) >= 0, "Missing component message omits recovery step");
                     Check.True(File.Exists(source), "Missing renderer removed source");
                 }
             });
+            add("renderer / bundled component takes precedence over old environment settings", () =>
+            {
+                using (TempCase temp = new TempCase())
+                {
+                    string bundled = temp.PathFor("mutool.exe");
+                    string other = temp.PathFor("old component.exe");
+                    File.WriteAllText(bundled, "test placeholder");
+                    File.WriteAllText(other, "test placeholder");
+                    Check.Equal(bundled, RendererPathResolver.Resolve(null, temp.DirectoryPath, other), "Bundled component priority");
+                    Check.Equal(bundled, RendererPathResolver.Resolve(null, temp.DirectoryPath, "invalid\0path"), "Invalid old setting blocked bundle");
+                }
+            });
+            add("renderer / source builds can use a valid configured component", () =>
+            {
+                using (TempCase temp = new TempCase())
+                {
+                    string configured = temp.PathFor("configured component.exe");
+                    File.WriteAllText(configured, "test placeholder");
+                    Check.Equal(configured, RendererPathResolver.Resolve(null, temp.DirectoryPath, configured), "Configured fallback");
+                    Check.Equal(temp.PathFor("mutool.exe"), RendererPathResolver.Resolve(null, temp.DirectoryPath, "invalid\0path"), "Invalid setting handling");
+                    Check.Equal(temp.PathFor("mutool.exe"), RendererPathResolver.Resolve(null, temp.DirectoryPath, temp.PathFor("missing.exe")), "Missing configured path handling");
+                }
+            });
+            add("renderer / explicit component selections never silently fall back", () =>
+            {
+                using (TempCase temp = new TempCase())
+                {
+                    File.WriteAllText(temp.PathFor("mutool.exe"), "test placeholder");
+                    string missing = temp.PathFor("explicit missing.exe");
+                    Check.Equal(missing, RendererPathResolver.Resolve(missing, temp.DirectoryPath, null), "Explicit override");
+                    AppError error = Check.Throws<AppError>(() => RendererPathResolver.Resolve("invalid\0path", temp.DirectoryPath, null), "Invalid explicit path");
+                    Check.Equal(AppErrorKind.ComponentUnavailable, error.Kind, "Invalid explicit path classification");
+                }
+            });
+            add("renderer / invalid executable is a component error and preserves PDF", () =>
+            {
+                using (TempCase temp = new TempCase())
+                {
+                    string source = temp.Pdf();
+                    string broken = temp.PathFor("broken.exe");
+                    File.WriteAllText(broken, "This is not an executable.");
+                    AppError error = Check.Throws<AppError>(() => new PdfConverter(broken).Prepare(source, CancellationToken.None), "Invalid executable");
+                    Check.Equal(AppErrorKind.ComponentUnavailable, error.Kind, "Invalid executable classification");
+                    Check.True(File.Exists(source), "Component failure removed source");
+                }
+            });
+            add("renderer / missing DLL exit is a component error", () => CheckComponentExit("missing-dll"));
+            add("renderer / invalid Windows image exit is a component error", () => CheckComponentExit("bad-image"));
             add("renderer / single page prepares a disposable preview", () =>
             {
                 using (TempCase temp = new TempCase())
@@ -197,6 +246,17 @@ namespace ParcelCrop.Tests
                         "Wrong diagnostic for " + mode + ": " + error.Message);
                 Check.True(File.Exists(source), "Rejected preparation removed source");
                 Check.True(!File.Exists(Path.ChangeExtension(source, ".jpg")), "Rejected preparation published output");
+            }
+        }
+
+        private static void CheckComponentExit(string mode)
+        {
+            using (TempCase temp = new TempCase())
+            {
+                string source = temp.FakePdf(mode);
+                AppError error = Check.Throws<AppError>(() => new PdfConverter(Program.SelfPath).Prepare(source, CancellationToken.None), "Component load failure");
+                Check.Equal(AppErrorKind.ComponentUnavailable, error.Kind, "Component exit classification");
+                Check.True(File.Exists(source), "Component exit removed source");
             }
         }
 
