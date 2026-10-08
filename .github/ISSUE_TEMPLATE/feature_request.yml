@@ -1,0 +1,9 @@
+name: Feature request / 功能建议
+description: Describe a workflow that ParcelCrop could improve.
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Problem and proposed behavior
+    validations:
+      required: true

@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <DebugType>portable</DebugType>
+    <LangVersion>latest</LangVersion>
+    <Version>2.2.0</Version>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,24 @@
+name: Bug report / 问题反馈
+description: Report a reproducible problem with ParcelCrop 4x6.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not upload real shipping labels. Remove addresses, phone numbers and tracking codes; use a synthetic PDF whenever possible.
+  - type: input
+    id: versions
+    attributes:
+      label: Application, Windows and MuPDF versions
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include expected and actual behavior, source folder type and whether recycling was enabled.
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Error message and sanitized example
