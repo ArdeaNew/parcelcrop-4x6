@@ -104,7 +104,7 @@ namespace ParcelCrop.Tests
 
         internal void NoTemporaryOutputs()
         {
-            Check.Equal(0, Directory.GetFiles(DirectoryPath, ".labeltrim-*.tmp").Length, "Temporary output leaked");
+            Check.Equal(0, Directory.GetFiles(DirectoryPath, ".parcelcrop-*.tmp").Length, "Temporary output leaked");
         }
 
         internal static string Hash(string path)
