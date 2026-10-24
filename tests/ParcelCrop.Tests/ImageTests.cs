@@ -66,6 +66,16 @@ namespace ParcelCrop.Tests
                     Check.Equal(new Rectangle(47, 47, 14, 14), ContentCrop.Detect(image), "Near-white scan background");
                 }
             });
+            add("crop / A4 labels prefer the upper-left region", () =>
+            {
+                using (Bitmap image = Images.White(800, 1131))
+                {
+                    Images.Fill(image, new Rectangle(40, 50, 420, 600), Color.Black);
+                    Images.Fill(image, new Rectangle(700, 1050, 30, 30), Color.Black);
+                    Rectangle crop = ContentCrop.Detect(image, preferTopLeft: true);
+                    Check.True(crop.Right < 600 && crop.Bottom < 800, "A4 upper-left label was not preferred");
+                }
+            });
             add("crop / one label frame excludes unrelated outside marks", () =>
             {
                 using (Bitmap image = Images.White(300, 400))
