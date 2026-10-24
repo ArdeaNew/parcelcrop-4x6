@@ -6,6 +6,8 @@
 
 运行环境为 Windows 64 位与 .NET Framework 4.8。程序需要源 PDF 所在文件夹的写入权限。
 
+对从 Amazon 等平台下载的 UPS、FedEx 等主流面单，单页 A4 PDF 的有效面单通常位于左上角。导入后先检查自动检测的范围，必要时用 **Detect** 或拖动裁切框微调。
+
 ## 裁切与导出
 
 1. 点击 **Browse files / Add files** 选择一个或多个单页 PDF，也可拖入窗口。将 PDF 拖到程序图标上也可导入。
