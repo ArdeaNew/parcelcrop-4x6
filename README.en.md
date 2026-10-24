@@ -1,35 +1,42 @@
-# ParcelCrop 4x6
+# ParcelCrop
 
-**Crop PDF shipping labels and export 4×6-inch JPGs**
+**A simple way to crop PDF shipping labels into 4×6-inch JPGs.**
 
 [Download](https://github.com/ArdeaNew/parcelcrop-4x6/releases/latest) · [简体中文](README.md) · [User guide](docs/USER_GUIDE.md) · [Changelog](CHANGELOG.md)
 
-ParcelCrop 4x6 imports batches of single-page PDFs, detects content bounds and previews the result. Adjust the crop rectangle or rotate the label before exporting.
+![ParcelCrop demo](docs/assets/parcelcrop-demo.gif)
 
-Output is a 1600×2400-pixel JPG at 400 DPI: a 4×6-inch, 2:3 canvas. Content keeps its proportions, is centered on white, and is saved beside the original PDF.
+ParcelCrop is a lightweight Windows label-cropping tool: drop in single-page PDFs, check the preview, and click **Process all**. JPGs are saved beside the original PDFs, and everything is processed locally without extra configuration. For UPS, FedEx and similar labels downloaded from marketplaces such as Amazon, the valid label area is usually in the upper-left of the single-page A4 PDF and is detected automatically.
+
+## Three simple steps
+
+1. **Add**: click **Add files**, or drag multiple PDFs into the window.
+2. **Check**: review the automatic crop; drag the crop box or use **Detect** and **Rotate** when needed.
+3. **Export**: click **Process all** to create JPGs beside the source PDFs.
 
 ## Features
 
-- Add or drag in multiple single-page PDFs.
-- Automatic bounds detection, crop previews, proportional adjustments and 90° rotation.
-- Consistent JPG dimensions with centered white margins.
-- Keep original PDFs by default; optionally recycle them after successful export.
-- Local processing, queue management, batch export and retry.
+- Batch import of single-page PDFs with automatic content-bound detection.
+- Crop preview with proportional adjustment, repositioning and 90° rotation.
+- Consistent 4×6-inch JPG output with centered white margins and preserved proportions.
+- Original PDFs are kept by default and can be moved to the Recycle Bin after a successful export.
+- Local processing with queue removal, batch export and retry support.
+
+## Output
+
+- 1600×2400 pixels, 400 DPI, 4×6 inches, 2:3 aspect ratio.
+- Cropped content is scaled proportionally and centered on white; JPEG quality is 95.
+- The 2:3 ratio applies to the output canvas, so content is never stretched. Existing JPGs are not overwritten.
 
 ## Quick start
 
 Requires Windows x64 and .NET Framework 4.8.
 
 1. Download the `win-x64.zip` portable package from [Releases](https://github.com/ArdeaNew/parcelcrop-4x6/releases/latest) and extract the entire archive.
-2. Open `ParcelCrop.exe`. **The PDF processing component is included; no separate configuration is needed.**
-3. Click **Add files** or drop PDFs onto the window. Review and adjust each crop.
-4. Click **Process all**. JPGs are saved beside their source PDFs.
+2. Open `ParcelCrop.exe`. The PDF processing component is included; no extra setup is needed.
+3. Add PDFs, check the preview, and click **Process all**.
 
-Each input PDF must contain one page. Existing JPGs are not overwritten. The 2:3 ratio applies to the output canvas; content is not stretched. See the [user guide](docs/USER_GUIDE.md) for more detail.
-
-## Development and feedback
-
-See [development](docs/DEVELOPMENT.md), [validation](docs/VALIDATION.md), [contributing](CONTRIBUTING.md) and [security](SECURITY.md).
+Each input PDF must contain one page. See the [user guide](docs/USER_GUIDE.md) for the full workflow.
 
 ## License
 

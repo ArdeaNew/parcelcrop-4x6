@@ -1,6 +1,6 @@
 # Third-party notices
 
-## ParcelCrop 4x6
+## ParcelCrop
 
 本项目代码与文档采用 **GNU Affero General Public License v3.0 or later（AGPL-3.0-or-later）**，完整条款见 [LICENSE](LICENSE)。
 
