@@ -12,6 +12,45 @@ internal static class ContentCrop
 {
 	internal static Rectangle Detect(Bitmap image)
 	{
+		return DetectCore(image);
+	}
+
+	internal static Rectangle Detect(Bitmap image, bool preferTopLeft)
+	{
+		Rectangle full = DetectCore(image);
+		if (!preferTopLeft || full.IsEmpty || image.Width <= 0 || image.Height <= image.Width)
+		{
+			return full;
+		}
+
+		double pageRatio = (double)image.Height / image.Width;
+		if (pageRatio < 1.25 || pageRatio > 1.6)
+		{
+			return full;
+		}
+
+		int windowWidth = Math.Max(1, (int)Math.Round(image.Width * 0.8));
+		int windowHeight = Math.Max(1, (int)Math.Round(image.Height * 0.72));
+		using Bitmap topLeft = image.Clone(new Rectangle(0, 0, windowWidth, windowHeight), PixelFormat.Format24bppRgb);
+		Rectangle candidate = DetectCore(topLeft);
+		if (candidate.IsEmpty)
+		{
+			return full;
+		}
+
+		bool nearTopLeft = candidate.Left <= image.Width * 0.15 && candidate.Top <= image.Height * 0.15;
+		bool insideWindow = candidate.Right <= windowWidth - 4 && candidate.Bottom <= windowHeight - 4;
+		long candidateArea = (long)candidate.Width * candidate.Height;
+		long fullArea = (long)full.Width * full.Height;
+		if (nearTopLeft && insideWindow && (fullArea > candidateArea * 1.25 || !full.Contains(candidate)))
+		{
+			return candidate;
+		}
+		return full;
+	}
+
+	private static Rectangle DetectCore(Bitmap image)
+	{
 		int width = image.Width;
 		int height = image.Height;
 		int num = checked(width * height);

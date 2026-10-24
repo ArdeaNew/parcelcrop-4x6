@@ -116,7 +116,7 @@ internal sealed class MainForm : Form
 		specification = MakeLabel("4 x 6 in  /  1600 x 2400 px  /  400 dpi", 9f, Muted);
 		queueHeading = MakeLabel("FILES", 9f, Ink);
 		status = MakeLabel("", 9f, Ink);
-		note = MakeLabel("JPGs save beside the PDFs. Original PDFs are kept by default.", 8.5f, Muted);
+		note = MakeLabel("JPGs save beside the PDFs.\r\nOriginal PDFs are kept by default.", 8.5f, Muted);
 		recycleSource = new CheckBox
 		{
 			Text = "Move PDF to Recycle Bin after successful export",
@@ -340,15 +340,16 @@ internal sealed class MainForm : Form
 			clearButton.SetBounds(num - num3 - S(87), num9 + S(6), S(53), S(32));
 			removeButton.SetBounds(num - num3 - S(28), num9 + S(6), S(28), S(32));
 			int num11 = num9 + S(52);
-			FileQueue.SetBounds(num8, num11, num6, Math.Max(S(100), num10 - num11 - S(164)));
-			Details.SetBounds(num8 + S(6), num10 - S(154), num6 - S(12), S(112));
+			FileQueue.SetBounds(num8, num11, num6, Math.Max(S(130), num10 - num11 - S(88)));
+			Details.SetBounds(num8 + S(6), num10 - S(78), num6 - S(12), S(36));
 			openButton.SetBounds(num8 - S(6), num10 - S(33), S(111), S(33));
 			addButton.SetBounds(num - num3 - S(105), num10 - S(33), S(105), S(33));
 			browseButton.SetBounds((num7 - S(142)) / 2, Canvas.Height / 2 + S(19), S(142), S(38));
 			RetryPreviewButton.SetBounds((num7 - S(158)) / 2, Canvas.Height / 2 + S(19), S(158), S(38));
 			status.SetBounds(num3, num2 - S(91), num5 - S(200), S(26));
-			note.SetBounds(num3, num2 - S(65), num5 - S(200), S(22));
+			note.SetBounds(num3, num2 - S(62), num5 - S(200), S(43));
 			recycleSource.SetBounds(num3, num2 - S(40), num5 - S(200), S(24));
+			recycleSource.Visible = false;
 			StartButton.SetBounds(num - num3 - S(170), num2 - S(77), S(170), S(45));
 			Invalidate(invalidateChildren: true);
 		}

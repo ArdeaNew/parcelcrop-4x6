@@ -89,7 +89,7 @@ internal sealed class PdfConverter
 			using (Bitmap bitmap = new Bitmap(raster))
 			{
 				page.PageSize = bitmap.Size;
-				page.AutoCrop = ContentCrop.Detect(bitmap);
+				page.AutoCrop = ContentCrop.Detect(bitmap, preferTopLeft: true);
 				page.IsBlank = page.AutoCrop.IsEmpty;
 			}
 			token.ThrowIfCancellationRequested();
